@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Descent of Light — an autotroph energy explorer</title>
+<meta name="description" content="A map of the autotrophs that live on sunlight (and the ones that don't), and where each group's solar energy leaks away on the road to biomass.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<!-- ===================== MAP VIEW ===================== -->
+<main id="view-map" class="view active">
+  <header class="masthead">
+    <div class="wrap">
+      <div class="sunbadge" aria-hidden="true"></div>
+      <div class="eyebrow">A field guide to living on light</div>
+      <h1>The Descent of <em>Light</em></h1>
+      <p class="lede">Every autotroph builds its body from thin air — CO&#8322; pulled into biomass. Most run on sunlight; a few run on rust and brimstone. Start with the family tree, then open any group to watch its share of the Sun thin from 100% down to the few percent that survives as new growth.</p>
+      <div class="legend">
+        <span class="k"><span class="star">&#42;</span> facultatively mixotrophic &mdash; can also eat organic carbon</span>
+        <span class="k"><span class="swatch" style="background:var(--chloro)"></span> click a leaf &rarr; energy-flow diagram</span>
+      </div>
+    </div>
+  </header>
+  <div class="wrap">
+    <div id="tree" class="tree"></div>
+    <div class="foot">
+      Figures follow Zhu, Long &amp; Ort (2008/2010) and the Hall &amp; Rao energy budget. Organism images are stored locally under <span class="mono">images/</span> (credits in <a href="CREDITS.md">CREDITS.md</a>); deep links go to Wikipedia.
+    </div>
+  </div>
+</main>
+
+<!-- ===================== FLOW VIEW ===================== -->
+<main id="view-flow" class="view">
+  <div class="flow-top">
+    <div class="wrap">
+      <button class="back" id="backBtn">&larr; the map</button>
+      <div class="flow-title">
+        <div class="eyebrow" id="flowKicker">Oxygenic photoautotroph</div>
+        <h2 id="flowName">&nbsp;</h2>
+      </div>
+      <div class="flow-max" id="flowMaxBox">
+        <div class="big" id="flowMax">&nbsp;</div>
+        <div class="lbl">theoretical max</div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-body">
+    <p class="flow-intro" id="flowIntro"></p>
+    <div id="cascade" class="cascade"></div>
+    <div id="sharedBox"></div>
+    <div id="speciesBox"></div>
+  </div>
+  <div class="wrap"><div class="foot">Percentages are of the <em>original</em> incident sunlight and follow published maxima; realised field values are lower. Click any loss for the mechanism and sources.</div></div>
+</main>
+
+<!-- ===================== DRAWER ===================== -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

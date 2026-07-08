@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+# Publishes the site on every push to main (and on-demand from the Actions tab).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Permissions the official Pages deploy needs
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deploys at once; let an in-flight one finish
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # The whole site is a single self-contained index.html at the repo root,
+      # so we publish the root (this also carries the logo PNG and the CNAME file).
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
