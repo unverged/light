@@ -51,10 +51,15 @@ README.md · DEPLOY-GITHUB-PAGES.md
 
 ## Groups
 
-13 groups in `GROUPS`. The seven eukaryotic-algae leaves each have their **own** distinct
-page (not shared): `greenalgae`, `redalgae`, `diatoms`, `brownalgae`, `dinoflagellates`,
-`coccolithophores`, `euglenids`. Plus `c3`, `c4`, `cam`, `cyanobacteria`, `anox` (qualitative),
-`chemo` (donor grid).
+16 groups in `GROUPS`. Every leaf on the map has its **own** distinct page — none are shared.
+The seven eukaryotic algae: `greenalgae`, `redalgae`, `diatoms`, `brownalgae`, `dinoflagellates`,
+`coccolithophores`, `euglenids`. The land plants: `mosses`, `ferns`, `gymnosperms` (the three
+non-flowering grades) plus `c3`, `c4`, `cam` under Angiosperms. Then `cyanobacteria`,
+`anox` (qualitative), `chemo` (donor grid).
+
+`mosses`/`ferns`/`gymnosperms` run the same C₃ biochemistry as `c3` — they share the
+`calvinC3()` and `photorespC3()` stage builders — and differ only in the group-specific stage
+each one adds (desiccation downtime, shade saturation, needle self-shading + winter shutdown).
 
 ## Verifying a change (no browser needed)
 
