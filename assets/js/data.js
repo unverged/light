@@ -20,6 +20,9 @@ const CAT = {
   water:    {c:'var(--loss-absorb)',  name:'water attenuation'},
   calcify:  {c:'var(--loss-photoresp)',name:'calcification cost'},
   silica:   {c:'var(--loss-quantum)', name:'shell (silica) cost'},
+  desicc:   {c:'var(--loss-sat)',     name:'desiccation downtime'},
+  winter:   {c:'var(--loss-sat)',     name:'seasonal shutdown'},
+  needle:   {c:'var(--loss-absorb)',  name:'needle self-shading'},
 };
 
 /* -------------------------------------------------------------------------
@@ -74,6 +77,20 @@ const waterStage = (lost,remain)=>({
   concept:{title:'Photic zone', cap:'How sunlight thins and reddens with depth in the sea.'},
   links:[['Photic zone','Photic zone'],['Phycoerythrin','Phycoerythrin']]});
 
+/* the two stages every unpumped C₃ land plant shares (bryophytes → conifers → angiosperms) */
+const calvinC3 = (lost,remain)=>({
+  id:'carbon',cat:'carbon',lost,remain,label:'Building sugar is expensive',
+  short:'It takes 8+ photons to fix one CO₂; the Calvin cycle stores only a fraction of the light energy in sugar.',
+  detail:'The light reactions bank energy in ATP and NADPH, and the <b>Calvin–Benson cycle</b> spends it fixing CO₂ into carbohydrate. The bookkeeping is unforgiving: at least 8 photons (measured closer to 9–10) are needed per CO₂, driven through <b>two photosystems in series</b> (the Z-scheme). Most of the captured energy runs that machinery rather than ending up in the sugar itself.',
+  concept:{title:'Calvin cycle', cap:'The Calvin–Benson cycle: where CO₂ becomes carbohydrate, at a steep energy cost.'},
+  links:[['Calvin cycle','Calvin cycle'],['Light-dependent reactions','Light-dependent reactions'],['RuBisCO','RuBisCO']]});
+const photorespC3 = (lost,remain,extra)=>({
+  id:'photoresp',cat:'photoresp',lost,remain,label:'Rubisco grabs the wrong molecule',
+  short:'Rubisco fixes O₂ instead of CO₂ ~25% of the time; salvaging the mistake can burn 20–50% of the energy.',
+  detail:'Rubisco cannot cleanly tell CO₂ from O₂. At warm temperatures and today’s CO₂ levels it grabs oxygen roughly a quarter of the time, producing a toxic by-product the cell must recycle through <b>photorespiration</b> — releasing CO₂ and ammonia and consuming energy for no gain. In C₃ plants this wastes 20–50% of photosynthetic energy, and it is <b>the single biggest thing separating C₃ from C₄ and the aquatic microbes</b>, all of which concentrate CO₂ around Rubisco to shut it down.' + (extra?' '+extra:''),
+  concept:{title:'Photorespiration', cap:'Photorespiration: the costly salvage of Rubisco’s oxygenation mistakes.'},
+  links:[['Photorespiration','Photorespiration'],['RuBisCO','RuBisCO']]});
+
 /* -------------------------------------------------------------------------
    3. GROUPS  (each = one energy-flow page)
    remain / lost are % of the ORIGINAL incident sunlight.
@@ -82,21 +99,111 @@ const waterStage = (lost,remain)=>({
    ------------------------------------------------------------------------- */
 const GROUPS = {
 
+  /* ---------- Land plants: the three non-flowering grades, each its own page ---------- */
+
+  mosses:{
+    kind:'oxy', name:'Mosses &amp; bryophytes', kicker:'Oxygenic · C₃ · no roots, no plumbing', max:'≈2.5%',
+    intro:'The first plants to leave the water, and still built like it: no roots, no wood, and — in most species — <b>no vascular tissue</b> to move water upward. A moss cushion is <b>poikilohydric</b>, meaning it lets itself dry out to match the air and simply stops. It runs the ordinary C₃ chemistry of a beech tree, but through leaves one cell thick, and only while it happens to be wet.',
+    stages:[
+      STEP.nonpar(53,47),
+      {id:'absorb',cat:'absorb',lost:20,remain:33,label:'A leaf one cell thick',
+       short:'Bryophyte leaves are usually a single cell layer, so much of the in-band light passes straight through.',
+       detail:'A moss “leaf” is typically <b>one cell thick</b>, with no cuticle, no palisade layer and no internal air spaces to bounce photons back through the chlorophyll. Light that a beech leaf would catch on a second or third pass simply exits the far side. The whole cushion, rather than the individual leaf, is the light-capturing unit — which is why mosses grow as dense mats and why an isolated shoot absorbs so poorly.',
+       concept:{title:'Bryophyte', cap:'Bryophyte leaves: a single cell layer, no cuticle, no internal optics.'},
+       links:[['Bryophyte','Bryophyte'],['Moss','Moss']]},
+      STEP.thermal(25,8),
+      calvinC3(14,11),
+      photorespC3(4.5,6.5),
+      {id:'desicc',cat:'desicc',lost:3.0,remain:3.5,label:'Most of the year, the shop is shut',
+       short:'With no way to pull water up, a moss dries to air-dryness and photosynthesis stops until it rains.',
+       detail:'This is the stage that has no counterpart in a vascular plant. Lacking roots and xylem, a moss cannot hold its water against a dry afternoon; it equilibrates with the air, its cells shrink, and photosynthesis halts within minutes. Sunlight keeps falling on a metabolically dead cushion. Averaged over a year, a temperate moss may be <b>hydrated and photosynthesising only a fraction of the daylight hours</b> — so its annual energy conversion is far below what a single well-watered hour would suggest. The trade is real, though: rewetting restores full photosynthesis in minutes, and desiccated moss survives conditions that would kill any tree.',
+       concept:{title:'Poikilohydry', cap:'Poikilohydry: hydration — and metabolism — tracks the surrounding air.'},
+       links:[['Poikilohydry','Poikilohydry'],['Desiccation tolerance','Desiccation tolerance'],['Sphagnum','Sphagnum']]},
+      STEP.resp(2.5,1.0,'Maintenance respiration — modest in absolute terms, but a large slice of a very small carbon budget.')
+    ],
+    win:{label:'it can die and come back', text:'A desiccated moss can sit air-dry for months, then resume full photosynthesis within minutes of a rain shower — a resurrection no vascular plant can perform.'},
+    sharedNote:'Mosses lose on efficiency and win on tenacity. <i>Sphagnum</i> peat bogs, built by exactly this slow, intermittent chemistry, hold roughly <b>a third of all soil carbon on Earth</b> — more than every tropical forest combined. Rate is not the same as stock.',
+    species:[
+      {n:'Peat moss',s:'Sphagnum',wiki:'Sphagnum'},
+      {n:'Model moss',s:'Physcomitrium patens',wiki:'Physcomitrium patens'},
+      {n:'Common haircap',s:'Polytrichum commune',wiki:'Polytrichum commune'},
+      {n:'Silvergreen bryum',s:'Bryum argenteum',wiki:'Bryum argenteum'},
+      {n:'Common liverwort',s:'Marchantia polymorpha',wiki:'Marchantia polymorpha'},
+      {n:'Hornwort',s:'Anthoceros agrestis',wiki:'Anthoceros'},
+    ],
+  },
+
+  ferns:{
+    kind:'oxy', name:'Ferns', kicker:'Oxygenic · C₃ · vascular, built for the understorey', max:'≈3.6%',
+    intro:'The first plants with real plumbing — xylem, phloem, true roots — but still reproducing by <b>spores</b>, not seeds. Ferns dominated the Carboniferous canopy; today most of them live in the shade beneath flowering plants. Their photosynthetic machinery is tuned for that dim, flecked understorey light, which is precisely why it wastes so much of a bright one.',
+    stages:[
+      STEP.nonpar(53,47), STEP.absorb(37,16), STEP.thermal(28,9),
+      calvinC3(16,12),
+      photorespC3(5.4,6.6,'Ferns are ordinary C₃ plants here — no pump, no escape.'),
+      {id:'sat',cat:'sat',lost:1.8,remain:4.8,label:'Tuned for shade, dazzled by sun',
+       short:'Fern photosynthesis saturates at a fraction of full sunlight; the surplus is quenched as heat.',
+       detail:'An understorey fern reaches its maximum rate at perhaps <b>a fifth to a third of full sunlight</b> — a low <b>light saturation point</b> — because it is built to exploit dim, patchy light rather than a noon beam. In bright sun the excess is bled off as heat through <b>non-photochemical quenching</b>, and many species actively swing their chloroplasts edge-on to the light to avoid damage. Ferns also have far fewer, larger stomata than angiosperms and open them sluggishly, so a passing sunfleck is often over before CO₂ supply catches up. Low saturation is the price of a low <b>light compensation point</b> — the ability to turn a profit in gloom that would starve a grass.',
+       concept:{title:'Chloroplast', cap:'Chloroplast avoidance movement: turning edge-on to escape excess light.'},
+       links:[['Photosynthetic efficiency','Photosynthetic efficiency'],['Non-photochemical quenching','Non-photochemical quenching'],['Fern','Fern']]},
+      STEP.resp(3.6,1.2,'Maintenance and growth respiration, including the fronds’ non-photosynthetic stipe and rhizome.')
+    ],
+    win:{label:'profitable in the gloom', text:'A low light compensation point lets ferns show a net carbon gain in shade where a C₄ grass would respire away more than it fixed — which is how they hold the forest floor.'},
+    sharedNote:'Ferns keep a trick the seed plants lost: their stomata respond weakly to the drought hormone ABA, and open on light alone. It suits a damp understorey and rules out a dry one.',
+    species:[
+      {n:'Bracken',s:'Pteridium aquilinum',wiki:'Pteridium aquilinum'},
+      {n:'Hart’s-tongue',s:'Asplenium scolopendrium',wiki:'Asplenium scolopendrium'},
+      {n:'Ostrich fern',s:'Matteuccia struthiopteris',wiki:'Matteuccia struthiopteris'},
+      {n:'Tree fern',s:'Dicksonia antarctica',wiki:'Dicksonia antarctica'},
+      {n:'Model fern',s:'Ceratopteris richardii',wiki:'Ceratopteris richardii'},
+      {n:'Water fern',s:'Azolla filiculoides',wiki:'Azolla'},
+      {n:'Resurrection fern',s:'Pleopeltis polypodioides',wiki:'Pleopeltis polypodioides'},
+    ],
+  },
+
+  gymnosperms:{
+    kind:'oxy', name:'Gymnosperms', kicker:'Oxygenic · C₃ · evergreen, needle-leaved', max:'≈3.9%',
+    intro:'Conifers, cycads, <i>Ginkgo</i> — seed plants whose ovules sit <b>naked</b> on a cone scale rather than sealed in a fruit. They lost the canopy to flowering plants everywhere it was warm and wet, and kept everything that was cold, dry, poor or steep. Boreal conifer forest is still the largest terrestrial biome on Earth. Its photosynthesis is the same C₃ chemistry as a wheat field, run at a deliberately slower and more durable setting.',
+    stages:[
+      STEP.nonpar(53,47),
+      {id:'needle',cat:'needle',lost:18,remain:35,label:'Needles in the shade of other needles',
+       short:'Clustered needles and thick waxy cuticles mean each one sees a beam already skimmed by its neighbours.',
+       detail:'A conifer shoot bundles its needles densely around the twig, so at the scale of a single needle much of the light has already been intercepted by the needles above and around it — <b>self-shading within the shoot</b>. Thick cuticles and a heavy surface wax reflect more than a broad leaf’s surface does. The canopy as a whole intercepts light superbly (which is why a spruce forest floor is dark); the individual needle does not.',
+       concept:{title:'Pinophyta', cap:'Needle-leaved shoots: excellent canopy interception, mediocre per-needle absorptance.'},
+       links:[['Pinophyta','Pinophyta'],['Leaf area index','Leaf area index']]},
+      STEP.thermal(27,8),
+      {id:'carbon',cat:'carbon',lost:15,remain:12,label:'Sugar, through a thick needle',
+       short:'The ordinary C₃ Calvin cycle, throttled by how slowly CO₂ diffuses into a dense, waxy needle.',
+       detail:'The Calvin–Benson cycle costs a conifer exactly what it costs a beech: 8+ photons per CO₂ through the two-photosystem Z-scheme. On top of that, a needle’s thick walls and tightly packed mesophyll give it a <b>low mesophyll conductance</b> — CO₂ moves reluctantly from the stomatal pore to Rubisco — so the enzyme sits at a lower internal CO₂ concentration than a thin broadleaf’s does. Conifers accept a slower carbon intake in exchange for a needle that survives frost, drought and several years of weather.',
+       concept:{title:'Calvin cycle', cap:'The Calvin–Benson cycle, fed through a needle’s reluctant diffusion path.'},
+       links:[['Calvin cycle','Calvin cycle'],['RuBisCO','RuBisCO'],['Stoma','Stoma']]},
+      photorespC3(4.6,7.4,'A low internal CO₂ concentration makes it slightly worse, not better.'),
+      {id:'winter',cat:'winter',lost:1.9,remain:5.5,label:'Green all winter, working for none of it',
+       short:'Below freezing the needles stay on, but photosynthesis shuts down while the sunlight keeps arriving.',
+       detail:'Keeping needles through the winter is what makes a conifer a conifer — but for months the machinery is deliberately switched off. Cold triggers <b>sustained non-photochemical quenching</b>: the needle dismantles its capacity to use light and converts nearly every absorbed photon to heat, because a frozen Calvin cycle cannot consume the electrons and a lit, idle photosystem destroys itself. Sunlight falls on green needles that fix nothing, and the recovery each spring takes weeks. Averaged over the year, this is a real deduction from the light budget — the price of being ready the moment it thaws.',
+       concept:{title:'Non-photochemical quenching', cap:'Sustained winter NPQ: absorbed light dumped as heat for months.'},
+       links:[['Non-photochemical quenching','Non-photochemical quenching'],['Evergreen','Evergreen'],['Pinophyta','Pinophyta']]},
+      STEP.resp(3.9,1.6,'Maintenance respiration — and a conifer must feed decades of accumulated sapwood, not one season’s growth.')
+    ],
+    win:{label:'no leaf-out lag', text:'An evergreen begins fixing carbon the first warm day of spring and is still working the last warm day of autumn, while a deciduous neighbour spends weeks building leaves it will discard. In a short growing season that head start beats any per-photon efficiency.'},
+    sharedNote:'Conifers embody the same bargain as every gymnosperm: a slower, tougher, cheaper leaf that lasts three to ten years rather than one. It loses the race for light wherever the season is long — and wins everywhere the season is short.',
+    species:[
+      {n:'Scots pine',s:'Pinus sylvestris',wiki:'Pinus sylvestris'},
+      {n:'Norway spruce',s:'Picea abies',wiki:'Picea abies'},
+      {n:'Coast redwood',s:'Sequoia sempervirens',wiki:'Sequoia sempervirens'},
+      {n:'Ginkgo',s:'Ginkgo biloba',wiki:'Ginkgo biloba'},
+      {n:'Bristlecone pine',s:'Pinus longaeva',wiki:'Pinus longaeva'},
+      {n:'Sago cycad',s:'Cycas revoluta',wiki:'Cycas revoluta'},
+      {n:'Common yew',s:'Taxus baccata',wiki:'Taxus baccata'},
+    ],
+  },
+
   c3:{
     kind:'oxy', name:'C₃ land plants', kicker:'Oxygenic photoautotroph · no CO₂ pump', max:'4.6%',
     intro:'The default pathway of most trees, shrubs and temperate crops — beech, wheat, rice. Rubisco fixes CO₂ directly from the air, with <b>no mechanism to concentrate it</b>, which leaves the door open to photorespiration. This is the baseline every other group is measured against.',
     stages:[
       STEP.nonpar(53,47), STEP.absorb(37,16), STEP.thermal(28,9),
-      {id:'carbon',cat:'carbon',lost:16,remain:12,label:'Building sugar is expensive',
-       short:'It takes 8+ photons to fix one CO₂; the Calvin cycle stores only a fraction of the light energy in sugar.',
-       detail:'The light reactions bank energy in ATP and NADPH, and the <b>Calvin–Benson cycle</b> spends it fixing CO₂ into carbohydrate. The bookkeeping is unforgiving: at least 8 photons (measured closer to 9–10) are needed per CO₂, driven through <b>two photosystems in series</b> (the Z-scheme). Most of the captured energy runs that machinery rather than ending up in the sugar itself.',
-       concept:{title:'Calvin cycle', cap:'The Calvin–Benson cycle: where CO₂ becomes carbohydrate, at a steep energy cost.'},
-       links:[['Calvin cycle','Calvin cycle'],['Light-dependent reactions','Light-dependent reactions'],['RuBisCO','RuBisCO']]},
-      {id:'photoresp',cat:'photoresp',lost:5.4,remain:6.6,label:'Rubisco grabs the wrong molecule',
-       short:'Rubisco fixes O₂ instead of CO₂ ~25% of the time; salvaging the mistake can burn 20–50% of the energy.',
-       detail:'Rubisco cannot cleanly tell CO₂ from O₂. At warm temperatures and today’s CO₂ levels it grabs oxygen roughly a quarter of the time, producing a toxic by-product the cell must recycle through <b>photorespiration</b> — releasing CO₂ and ammonia and consuming energy for no gain. In C₃ plants this wastes 20–50% of photosynthetic energy, and it is <b>the single biggest thing separating C₃ from C₄ and the aquatic microbes</b>, all of which concentrate CO₂ around Rubisco to shut it down.',
-       concept:{title:'Photorespiration', cap:'Photorespiration: the costly salvage of Rubisco’s oxygenation mistakes.'},
-       links:[['Photorespiration','Photorespiration'],['RuBisCO','RuBisCO']]},
+      calvinC3(16,12),
+      photorespC3(5.4,6.6),
       STEP.resp(4.6,2.0)
     ],
     sharedNote:'C₃ plants also face a limit the aquatic groups escape entirely: opening stomata to admit CO₂ means losing water, so in heat or drought they must choose between carbon and dehydration.',
@@ -457,11 +564,11 @@ const TREE = {
         ]},
 
         { name:'Land plants', rank:'Embryophyta', note:'evolved from charophyte green algae', children:[
-          { leaf:true, groupId:'c3', name:'Mosses &amp; bryophytes', rank:'Bryophyta', img:'mosses',
+          { leaf:true, groupId:'mosses', name:'Mosses &amp; bryophytes', rank:'Bryophyta', img:'mosses',
             species:[{n:'Peat moss',s:'Sphagnum',wiki:'Sphagnum'},{n:'Model moss',s:'Physcomitrium patens',wiki:'Physcomitrium patens'}] },
-          { leaf:true, groupId:'c3', name:'Ferns', rank:'Polypodiopsida', img:'ferns',
-            species:[{n:'Bracken',s:'Pteridium aquilinum',wiki:'Pteridium aquilinum'}] },
-          { leaf:true, groupId:'c3', name:'Gymnosperms', rank:'conifers &amp; allies', img:'gymnosperms',
+          { leaf:true, groupId:'ferns', name:'Ferns', rank:'Polypodiopsida', img:'ferns',
+            species:[{n:'Bracken',s:'Pteridium aquilinum',wiki:'Pteridium aquilinum'},{n:'Hart’s-tongue',s:'Asplenium scolopendrium',wiki:'Asplenium scolopendrium'}] },
+          { leaf:true, groupId:'gymnosperms', name:'Gymnosperms', rank:'conifers &amp; allies', img:'gymnosperms',
             species:[{n:'Scots pine',s:'Pinus sylvestris',wiki:'Pinus sylvestris'},{n:'Ginkgo',s:'Ginkgo biloba',wiki:'Ginkgo biloba'}] },
           { name:'Flowering plants', rank:'Angiosperms', note:'split by carbon-fixation pathway', children:[
             { leaf:true, groupId:'c3', name:'C₃ plants', rank:'~85% of plant species', img:'c3',
