@@ -91,7 +91,7 @@ function nodeHTML(n, parentColor, depth){
     let cta;
     if(g.kind==='chemo') cta = '<span class="cta">No sunlight &mdash; how it lives &rarr;</span>';
     else if(g.kind==='anox') cta = '<span class="cta">A different way to use light &rarr;</span>';
-    else cta = '<span class="cta">Energy flow <span class="max">'+g.max+'</span> <span class="arrow">&rarr;</span></span>';
+    else cta = '<span class="cta">Incident sunlight to biomass conversion energy efficiency: <span class="max">'+g.max+'</span> <span class="arrow">&rarr;</span></span>';
     const sp = (n.species||[]).map(s=>'<span class="sp">'+s.n+(s.mixo?' <b class="sp-star" title="mixotrophic">&#42;</b>':'')+' <i>'+s.s+'</i></span>').join('');
     return '<button class="leaf'+(g.kind==='chemo'?' dark-cta':'')+'" data-group="'+n.groupId+'" style="--branch:'+(parentColor||'var(--chloro)')+'">'
       + '<div class="lead"><div class="thumb" data-img="'+n.img+'"><span class="ic">'+leafIcon(n)+'</span></div>'
